@@ -1,0 +1,13 @@
+{
+  "name": "Blob downloader",
+  "short_name": "Dl-blob",
+  "start_url": "/",
+  "display": "standalone",
+  "icons": [{
+    "src": "assets/icon/icon.png",
+    "sizes": "128x128",
+    "type": "image/png"
+  }],
+  "background_color": "#fce0a2",
+  "theme_color": "#fce0a2"
+}

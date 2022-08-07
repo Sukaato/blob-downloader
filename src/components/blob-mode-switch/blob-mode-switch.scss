@@ -1,0 +1,16 @@
+blob-mode-switch {
+  display: block;
+
+  ion-radio-group {
+    display: flex !important;
+
+    ion-item {
+      --background: transparent;
+      --border-radius: 10px;
+
+      ion-radio {
+        --color-checked: var(--ion-color-tertiary);
+      }
+    }
+  }
+}

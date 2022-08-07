@@ -1,0 +1,13 @@
+blob-options {
+  display: block;
+
+  ion-list {
+    background: var(--ion-color-prymary-shade);
+  }
+
+  .blob-options-content {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
