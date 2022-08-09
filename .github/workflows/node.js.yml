@@ -1,8 +1,14 @@
-name: 'publish'
+name: 'Quality'
+
 on:
   push:
     branches:
-      - release
+      - '**'
+      - '!test/*'
+  pull_request:
+    branches:
+      - '**'
+      - '!test/*'
 
 jobs:
   quality:
@@ -10,16 +16,18 @@ jobs:
       fail-fast: false
       matrix:
         platform: [macos-latest, ubuntu-latest, windows-latest]
-        
+        node-version: [16.x, 17.x, 18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Setup node
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
-          node-version: 16
+          node-version: ${{ matrix.node-version }}
 
       - name: Install
         run: npm ci
@@ -29,43 +37,29 @@ jobs:
 
       - name: Run lint
         run: npm run lint
-        
-  publish-tauri:
+
+  build:
+    needs: quality
     strategy:
       fail-fast: false
       matrix:
         platform: [macos-latest, ubuntu-latest, windows-latest]
+        node-version: [16.x, 17.x, 18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-        
-      - name: Setup node
+
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
-          node-version: 16
-          
-      - name: install Rust stable
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          
-      - name: install webkit2gtk (ubuntu only)
-        if: matrix.platform == 'ubuntu-latest'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y webkit2gtk-4.0
-          
-      - name: install app dependencies and build it
-        run: npm i && npm run build
-        
-      - uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
-          releaseName: 'App v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          prerelease: false
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build --if-present
+
