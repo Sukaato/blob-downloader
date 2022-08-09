@@ -1,5 +1,5 @@
 import { RadioGroupChangeEventDetail } from '@ionic/core';
-import { Component, Host, h, Listen, Event, EventEmitter } from '@stencil/core';
+import { Component, Event, EventEmitter, h, Host, Listen } from '@stencil/core';
 
 @Component({
   tag: 'blob-mode-switch',

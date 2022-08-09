@@ -1,7 +1,7 @@
 import { modalController, toastController } from '@ionic/core';
 import { Component, ComponentInterface, h, Host, Listen, State, Watch } from '@stencil/core';
-import { event, invoke } from '@tauri-apps/api';
-import { UnlistenFn } from '@tauri-apps/api/event';
+import { invoke } from '@tauri-apps/api';
+import { listen, UnlistenFn } from '@tauri-apps/api/event';
 import { appWindow } from '@tauri-apps/api/window';
 import { BlobArgs } from 'src/shared';
 
@@ -27,10 +27,10 @@ export class BlobApp implements ComponentInterface {
   async componentWillLoad(): Promise<void> {
     this.isFullscreen = await appWindow.isFullscreen();
 
-    this.$logs = await event.listen<string>('logs', event => {
+    this.$logs = await listen<string>('logs', event => {
       this.logs = [event.payload, ...this.logs];
     });
-    this.$logsEnd = await event.listen<FFmpegPayload>('logs:end', async event => {
+    this.$logsEnd = await listen<FFmpegPayload>('logs:end', async event => {
       if (event.payload.code === 0) {
         const toast = await toastController.create({
           message: 'Téléchargement terminé',
