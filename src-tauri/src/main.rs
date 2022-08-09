@@ -7,20 +7,10 @@ use online::check;
 use tauri::Runtime;
 use tauri::api::process::{Command, CommandEvent};
 use tauri::async_runtime;
-
-#[tauri::command]
-fn command_close<R: Runtime>(window: tauri::Window<R>) -> Result<(), String> {
-  window.close().unwrap();
-
-  Ok(())
-}
-
-#[tauri::command]
-fn command_reduce<R: Runtime>(window: tauri::Window<R>) -> Result<(), String> {
-  window.hide().unwrap();
-
-  Ok(())
-}
+use log::LevelFilter;
+use log4rs::append::file::FileAppender;
+use log4rs::encode::pattern::PatternEncoder;
+use log4rs::config::{Appender, Config, Root};
 
 #[tauri::command]
 async fn command_check_internet() -> Result<bool, ()> {
@@ -69,8 +59,6 @@ async fn command_ffmpeg(args: Vec<String>) -> Result<(), String> {
 fn main() {
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![
-      command_close,
-      command_reduce,
       command_check_internet,
       command_ffmpeg,
       ])

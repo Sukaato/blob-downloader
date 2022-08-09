@@ -2,7 +2,7 @@ blob-options {
   display: block;
 
   ion-list {
-    background: var(--ion-color-prymary-shade);
+    --ion-item-background: var(--ion-color-primary-shade);
   }
 
   .blob-options-content {

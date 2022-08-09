@@ -11,6 +11,8 @@ export class BlobModeSwitch {
 
   @Listen('ionChange')
   onChange(ev: CustomEvent<RadioGroupChangeEventDetail<BlobMode>>): void {
+    console.log(ev.detail);
+
     this.blobModeSelect.emit({ value: ev.detail.value });
   }
 
@@ -22,7 +24,7 @@ export class BlobModeSwitch {
             <ion-label>URL</ion-label>
             <ion-radio value='url' slot='start' />
           </ion-item>
-          <ion-item lines='none'>
+          <ion-item lines='none' disabled>
             <ion-label>Fichier</ion-label>
             <ion-radio value='file' slot='start' />
           </ion-item>

@@ -9,7 +9,7 @@ import { appWindow } from '@tauri-apps/api/window';
   tag: 'blob-app',
   styleUrl: 'blob-app.scss'
 })
-export class BlobApp {
+export class BlobApp implements ComponentInterface {
   private form!: HTMLFormElement;
 
   @State() isFullscreen: boolean;
@@ -22,6 +22,10 @@ export class BlobApp {
 
   async componentWillLoad(): Promise<void> {
     this.isFullscreen = await appWindow.isFullscreen();
+  @Listen('blobModeSelect')
+  onModeChangge(ev: CustomEvent<BlobModeEventDetail>): void {
+    this.mode = ev.detail.value;
+  }
   }
 
   @Listen('mousedown')
@@ -32,8 +36,8 @@ export class BlobApp {
     await appWindow.startDragging();
   }
 
-  private async onReduce(): Promise<void> {
-    await invoke('command_reduce');
+  private async onMinimize(): Promise<void> {
+    appWindow.minimize();
   }
 
   private onToggleFullscreen(): void {
@@ -41,7 +45,7 @@ export class BlobApp {
   }
 
   private async onClose(): Promise<void> {
-    await invoke('command_close');
+    appWindow.close();
   }
 
   private async onPressButton(): Promise<void> {
@@ -66,37 +70,6 @@ export class BlobApp {
       duration: 5000
     });
     await toast.present();
-    await invoke('command_ffmpeg', {
-      args: [
-        '-y',
-        `-i`,
-        options.url,
-        '-c:v',
-        'h264_nvenc',
-        '-b:v',
-        '2.6M',
-        '-filter:v',
-        'fps=25',
-        `${await downloadDir()}test.mp4`,
-      ]
-    });
-    // const args = [
-    //   '-y',
-    //   `-i`,
-    //   options.url,
-    //   '-c:v',
-    //   'h264_nvenc',
-    //   '-b:v',
-    //   '2.6M',
-    //   '-filter:v',
-    //   'fps=25',
-    //   `${await downloadDir()}test.mp4`,
-    // ];
-
-    // const ffmpeg = Command.sidecar(`bin/ffmpeg`, `-y -i ${options.url} -c:v h264_nvenc -b:v 2.6M -filter:v fps=25 ${await downloadDir()}test.mp4`);
-    // ffmpeg.stdout.on('data', console.log);
-    // const output = await ffmpeg.execute().catch(console.log);
-    // console.log(output);
   }
 
   private get isUrlMode(): boolean {
@@ -106,16 +79,17 @@ export class BlobApp {
   render() {
     return (
       <Host>
-        <header class='ion-justify-content-between' >
-          <div class='info ion-align-items-center'>
+        <ion-app>
+          <header class='ion-justify-content-between' >
+            <div class='info ion-align-items-center'>
             <ion-img src='/assets/icon/icon.png' id='app-logo' />
             <ion-text>
               <h1 id='app-title' class='ion-no-margin'>Blob downloader</h1>
             </ion-text>
           </div>
           <div class='actions ion-justify-content-between ion-align-items-center'>
-            <ion-button fill='clear' class='action ion-no-margin' onClick={() => this.onReduce()}>
-              <ion-icon name='remove-outline' slot='icon-only' />
+              <ion-button fill='clear' class='action ion-no-margin' onClick={() => this.onMinimize()}>
+                <ion-icon name='remove-outline' slot='icon-only' />
             </ion-button>
             <ion-button fill='clear' class='action ion-no-margin' onClick={() => this.onToggleFullscreen()}>
               <ion-icon name={this.isFullscreen ? 'contract-outline' : 'expand-outline'} slot='icon-only' />
@@ -127,19 +101,23 @@ export class BlobApp {
         </header>
         <main>
           <ion-content color='primary' class='ion-padding'>
-            <div class='app-content'>
-              <div>
-                <blob-mode-switch />
+              <div class='app-content'>
+                <div class='app-content__header ion-justify-content-between ion-align-items-center'>
+                  <blob-mode-switch />
+                  <ion-button fill='clear' color='tertiary' id='logs-button' class='ion-no-margin' title='Logs'>
+                    <ion-label>Logs</ion-label>
+                    <ion-icon name='reader-outline' slot='end'/>
+                  </ion-button>
+                </div>
+                <form ref={ref => this.form = ref}>
+                  {this.isUrlMode && <blob-mode-url />}
+                  <blob-options />
+                </form>
               </div>
-              <form ref={ref => this.form = ref}>
-                {this.isUrlMode && <blob-mode-url />}
-                <blob-options />
-              </form>
-            </div>
-          </ion-content>
-        </main>
-        <footer class='ion-justify-content-center ion-align-items-center'>
-          <ion-button type='submit' color='tertiary' onClick={() => this.onPressButton()}>Télécharger</ion-button>
+            </ion-content>
+          </main>
+          <footer class='ion-justify-content-center ion-align-items-center'>
+            <ion-button type='submit' color='tertiary' onClick={() => this.download()}>Télécharger</ion-button>
         </footer>
       </Host>
     );

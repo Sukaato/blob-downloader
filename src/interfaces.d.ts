@@ -4,6 +4,6 @@ interface BlobModeEventDetail {
   value: BlobMode;
 }
 
-interface FFMPEGOptions {
-  url: string;
+interface FFmpegPayload {
+  code: number;
 }
