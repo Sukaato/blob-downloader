@@ -19,18 +19,30 @@ async fn command_check_internet() -> Result<bool, ()> {
 }
 
 
-// remember to call `.manage(MyState::default())`
 #[tauri::command]
-async fn command_ffmpeg<R: Runtime>(window: tauri::Window<R>, args: Vec<String>) -> Result<(), String> {
+async fn command_ffmpeg<R: Runtime>(window: tauri::Window<R>, args: Vec<String>) -> Result<(), ()> {
   log::info!("ffmpeg command has called with argument: {}", args.join(" "));
 
-  let (mut rx, _) = Command::new_sidecar("ffmpeg")
-    .expect("failed to create `bin/ffmpeg` binary command")
+  let result_command = Command::new_sidecar("ffmpeg");
+  if result_command.is_err() {
+    log::error!("{}", result_command.unwrap_err());
+    return Err(());
+  } else {
+    log::info!("ffmpeg command created");
+  }
+
+  let receiver = result_command.unwrap()
     .args(args)
-    .spawn()
-    .expect("Failed to spawn sidecar");
+    .spawn();
+  if receiver.is_err() {
+    log::error!("{}", receiver.unwrap_err());
+    return Err(());
+  } else {
+    log::info!("ffmpeg receiver created");
+  }
 
   log::info!("ffmpeg has been called");
+  let (mut rx, _) = receiver.unwrap();
 
   async_runtime::spawn(async move {
     // read events such as stdout
@@ -57,7 +69,6 @@ async fn command_ffmpeg<R: Runtime>(window: tauri::Window<R>, args: Vec<String>)
   });
   Ok(())
 }
-
 
 fn main() {
   let logfile = FileAppender::builder()

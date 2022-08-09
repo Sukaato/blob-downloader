@@ -10,4 +10,8 @@ blob-options {
     gap: 12px;
     grid-template-columns: repeat(3, 1fr);
   }
+
+  ion-button {
+    height: 100%;
+  }
 }

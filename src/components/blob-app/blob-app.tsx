@@ -42,7 +42,7 @@ export class BlobApp implements ComponentInterface {
       } else {
         const toast = await toastController.create({
           message: 'Erreur lors du téléchargement',
-          color: 'error',
+          color: 'danger',
           position: 'top',
           duration: 5000
         });
@@ -59,12 +59,6 @@ export class BlobApp implements ComponentInterface {
   @Listen('blobModeSelect')
   onModeChangge(ev: CustomEvent<BlobModeEventDetail>): void {
     this.mode = ev.detail.value;
-  }
-
-  @Listen('close')
-  async closeModal(): Promise<void> {
-    const modal = await modalController.getTop();
-    await modal.dismiss();
   }
 
   @Listen('mousedown')
@@ -89,9 +83,23 @@ export class BlobApp implements ComponentInterface {
 
   private async download(): Promise<void> {
     const data = new FormData(this.form);
+    console.log(
+      BlobArgs.builder()
+        .setDownloadUrl(data.get('url') as string)
+        .setOutputPath(data.get('path') as string)
+        .setOutputName(data.get('name') as string)
+        .setExtension(data.get('ext') as string)
+        .setFps(parseInt(data.get('fps').toString()))
+        .setBitRate(data.get('bitrate') as string)
+        .setCodec(data.get('codec') as string)
+        .toJson()
+    );
+
     const args = await BlobArgs.builder()
       .setDownloadUrl(data.get('url') as string)
-      .setOutputName(data.get('outputName') as string)
+      .setOutputPath(data.get('path') as string)
+      .setOutputName(data.get('name') as string)
+      .setExtension(data.get('ext') as string)
       .setFps(parseInt(data.get('fps').toString()))
       .setBitRate(data.get('bitrate') as string)
       .setCodec(data.get('codec') as string)
@@ -107,6 +115,15 @@ export class BlobApp implements ComponentInterface {
       duration: 5000
     });
     await toast.present();
+  }
+
+  async clearLogs(): Promise<void> {
+    this.logs = [];
+  }
+
+  async closeModal(): Promise<void> {
+    const modal = await modalController.getTop();
+    await modal.dismiss();
   }
 
   private get isUrlMode(): boolean {
@@ -165,9 +182,14 @@ export class BlobApp implements ComponentInterface {
               <div class='logs-content'>
                 <header class='ion-justify-content-between ion-align-items-center'>
                   <ion-text color='light'>Logs</ion-text>
-                  <ion-button fill='clear' class='action ion-no-margin' onClick={() => this.closeModal()}>
-                    <ion-icon name='close-outline' slot='icon-only' />
-                  </ion-button>
+                  <div class='actions'>
+                    <ion-button fill='clear' class='action ion-no-margin' onClick={() => this.clearLogs()}>
+                      <ion-icon name='trash-outline' slot='icon-only' />
+                    </ion-button>
+                    <ion-button fill='clear' class='action ion-no-margin' onClick={() => this.closeModal()}>
+                      <ion-icon name='close-outline' slot='icon-only' />
+                    </ion-button>
+                  </div>
                 </header>
                 <div>
                   {this.logs.map(log => (
