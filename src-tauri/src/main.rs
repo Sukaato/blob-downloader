@@ -21,8 +21,8 @@ async fn command_check_internet() -> Result<bool, ()> {
 
 // remember to call `.manage(MyState::default())`
 #[tauri::command]
-async fn command_ffmpeg(args: Vec<String>) -> Result<(), String> {
-  println!("{:#?}", args);
+async fn command_ffmpeg<R: Runtime>(window: tauri::Window<R>, args: Vec<String>) -> Result<(), String> {
+  log::info!("ffmpeg command has called with argument: {}", args.join(" "));
 
   let (mut rx, _) = Command::new_sidecar("ffmpeg")
     .expect("failed to create `bin/ffmpeg` binary command")
@@ -30,7 +30,7 @@ async fn command_ffmpeg(args: Vec<String>) -> Result<(), String> {
     .spawn()
     .expect("Failed to spawn sidecar");
 
-  println!("ffmpeg has been called");
+  log::info!("ffmpeg has been called");
 
   async_runtime::spawn(async move {
     // read events such as stdout
@@ -38,12 +38,15 @@ async fn command_ffmpeg(args: Vec<String>) -> Result<(), String> {
       match event {
         CommandEvent::Stdout (line) => {
           println!("Line: {}", line);
+          window.emit("logs", line).unwrap();
         }
-        CommandEvent::Stderr (error) => {
-          println!("Error: {}", error);
+        CommandEvent::Stderr (line) => {
+          log::info!("{}", line);
+          window.emit("logs", line).unwrap();
         }
         CommandEvent::Terminated (terminated) => {
-          println!("End: {:#?}", terminated);
+          log::info!("Download end !");
+          window.emit("logs:end", terminated).unwrap();
         }
         CommandEvent::Error (error) => {
           println!("Error: {}", error);
@@ -57,6 +60,22 @@ async fn command_ffmpeg(args: Vec<String>) -> Result<(), String> {
 
 
 fn main() {
+  let logfile = FileAppender::builder()
+    .encoder(Box::new(PatternEncoder::new("{l} - {m}\n")))
+    .build("log/output.log")
+    .unwrap();
+
+    let config = Config::builder()
+      .appender(Appender::builder().build("logfile", Box::new(logfile)))
+      .build(Root::builder()
+        .appender("logfile")
+        .build(LevelFilter::Info)
+      )
+      .unwrap();
+
+  log4rs::init_config(config).unwrap();
+  log::info!("App start");
+
   tauri::Builder::default()
     .invoke_handler(tauri::generate_handler![
       command_check_internet,

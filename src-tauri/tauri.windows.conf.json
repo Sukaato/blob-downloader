@@ -4,7 +4,7 @@
       "iconPath": "icons/icon.ico"
     },
     "bundle": {
-      "identifier": "com.cheesegrinder.blob-downloader",
+      "identifier": "blob-downloader",
       "externalBin": [
         "bin/ffmpeg"
       ],
