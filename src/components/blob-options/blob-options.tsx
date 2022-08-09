@@ -1,6 +1,5 @@
 import { Component, h, Host, State } from '@stencil/core';
 import { dialog } from '@tauri-apps/api';
-import {} from '@tauri-apps/api/dialog';
 import { downloadDir, sep } from '@tauri-apps/api/path';
 
 @Component({

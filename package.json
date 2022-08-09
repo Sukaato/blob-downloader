@@ -10,10 +10,10 @@
     "prestart": "node ./scripts/move-binaries.js",
     "start": "stencil build --dev --watch --serve --no-open",
     "test": "stencil test --spec --e2e",
-    "test.watch": "stencil test --spec --e2e --watchAll",
+    "test:watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate",
     "prettier": "prettier --write \"src/**/*.{ts,tsx,scss}\"",
-    "prettier.check": "prettier --check \"src/**/*.{ts,tsx,scss}\"",
+    "prettier:check": "prettier --check \"src/**/*.{ts,tsx,scss}\"",
     "lint": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "tauri": "tauri"
   },
@@ -36,6 +36,7 @@
     "eslint": "^8.21.0",
     "eslint-plugin-react": "^7.30.1",
     "execa": "^6.1.0",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "typescript": "^4.7.4"
   }
 }
