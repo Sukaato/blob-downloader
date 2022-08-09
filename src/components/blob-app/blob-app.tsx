@@ -96,10 +96,9 @@ export class BlobApp implements ComponentInterface {
       .setBitRate(data.get('bitrate') as string)
       .setCodec(data.get('codec') as string)
       .build();
-    await invoke('command_ffmpeg', { args })
-      .catch(err => {
-        this.logs = [err, ...this.logs]
-      });
+    await invoke('command_ffmpeg', { args }).catch(err => {
+      this.logs = [err, ...this.logs];
+    });
 
     const toast = await toastController.create({
       message: 'Téléchargement en cours ...',
@@ -118,11 +117,13 @@ export class BlobApp implements ComponentInterface {
     return (
       <Host>
         <ion-app>
-          <header class='ion-justify-content-between' >
+          <header class='ion-justify-content-between'>
             <div class='info ion-align-items-center'>
               <ion-img src='/assets/icon/icon.png' id='app-logo' />
               <ion-text>
-                <h1 id='app-title' class='ion-no-margin'>Blob downloader</h1>
+                <h1 id='app-title' class='ion-no-margin'>
+                  Blob downloader
+                </h1>
               </ion-text>
             </div>
             <div class='actions ion-justify-content-between ion-align-items-center'>
@@ -144,10 +145,10 @@ export class BlobApp implements ComponentInterface {
                   <blob-mode-switch />
                   <ion-button fill='clear' color='tertiary' id='logs-button' class='ion-no-margin' title='Logs'>
                     <ion-label>Logs</ion-label>
-                    <ion-icon name='reader-outline' slot='end'/>
+                    <ion-icon name='reader-outline' slot='end' />
                   </ion-button>
                 </div>
-                <form ref={ref => this.form = ref}>
+                <form ref={ref => (this.form = ref)}>
                   {this.isUrlMode && <blob-mode-url />}
                   <blob-options />
                 </form>
@@ -155,7 +156,9 @@ export class BlobApp implements ComponentInterface {
             </ion-content>
           </main>
           <footer class='ion-justify-content-center ion-align-items-center'>
-            <ion-button type='submit' color='tertiary' onClick={() => this.download()}>Télécharger</ion-button>
+            <ion-button type='submit' color='tertiary' onClick={() => this.download()}>
+              Télécharger
+            </ion-button>
           </footer>
           <ion-modal trigger='logs-button'>
             <ion-content>
@@ -180,5 +183,4 @@ export class BlobApp implements ComponentInterface {
       </Host>
     );
   }
-
 }

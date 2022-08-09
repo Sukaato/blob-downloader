@@ -5,7 +5,6 @@ import { Component, h, Host, State } from '@stencil/core';
   styleUrl: 'blob-options.scss'
 })
 export class BlobOptions {
-
   @State() show: boolean;
 
   private toggle(): void {
@@ -50,5 +49,4 @@ export class BlobOptions {
       </Host>
     );
   }
-
 }

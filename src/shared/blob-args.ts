@@ -37,20 +37,8 @@ export class BlobArgs {
     return this;
   }
 
-
   async build(): Promise<string[]> {
-    const args = [
-      '-y',
-      '-i',
-      this.downloadUrl,
-      '-c:v',
-      this.codec,
-      '-b:v',
-      this.bitrate,
-      '-filter:v',
-      `fps=${this.fps}`,
-      `${await downloadDir()}${this.outputName}.mp4`,
-    ];
+    const args = ['-y', '-i', this.downloadUrl, '-c:v', this.codec, '-b:v', this.bitrate, '-filter:v', `fps=${this.fps}`, `${await downloadDir()}${this.outputName}.mp4`];
 
     return args;
   }

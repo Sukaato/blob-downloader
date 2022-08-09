@@ -3,10 +3,9 @@ import { Component, Host, h, Listen, Event, EventEmitter } from '@stencil/core';
 
 @Component({
   tag: 'blob-mode-switch',
-  styleUrl: 'blob-mode-switch.scss',
+  styleUrl: 'blob-mode-switch.scss'
 })
 export class BlobModeSwitch {
-
   @Event() blobModeSelect: EventEmitter<BlobModeEventDetail>;
 
   @Listen('ionChange')
@@ -20,7 +19,7 @@ export class BlobModeSwitch {
     return (
       <Host>
         <ion-radio-group value='url'>
-          <ion-item lines='none' >
+          <ion-item lines='none'>
             <ion-label>URL</ion-label>
             <ion-radio value='url' slot='start' />
           </ion-item>
@@ -32,5 +31,4 @@ export class BlobModeSwitch {
       </Host>
     );
   }
-
 }
