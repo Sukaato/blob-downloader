@@ -63,10 +63,11 @@ export class BlobArgs {
     const output = `${this.path}${this.outputName}.${this.ext}`;
     const args = ['-y', '-i', this.downloadUrl, '-c:v', this.codec, '-b:v', this.bitrate, '-filter:v', `fps=${this.fps}`, output];
 
+    console.log(this.toJson());
     return args;
   }
 
-  toJson(): Record<string, unknown> {
+  private toJson(): Record<string, unknown> {
     return {
       downloadUrl: this.downloadUrl,
       outputName: this.outputName,

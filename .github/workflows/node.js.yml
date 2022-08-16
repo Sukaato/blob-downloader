@@ -13,7 +13,6 @@ on:
 jobs:
   quality:
     strategy:
-      fail-fast: false
       matrix:
         node-version: [16.x, 17.x, 18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
@@ -40,7 +39,6 @@ jobs:
   build:
     needs: quality
     strategy:
-      fail-fast: false
       matrix:
         node-version: [16.x, 17.x, 18.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/

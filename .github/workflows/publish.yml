@@ -32,12 +32,9 @@ jobs:
         run: npm run lint
 
   publish-tauri:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+    needs: quality
+    runs-on: windows-latest
 
-    runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2

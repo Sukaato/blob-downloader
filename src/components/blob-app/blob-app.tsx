@@ -17,7 +17,7 @@ export class BlobApp implements ComponentInterface {
 
   @State() isFullscreen: boolean;
   @State() mode: BlobMode = 'url';
-  @State() logs: string[] = [];
+  @State() logs: LogPayload[] = [];
 
   @Watch('isFullscreen')
   async onScreenModeChange(current: boolean): Promise<void> {
@@ -27,7 +27,7 @@ export class BlobApp implements ComponentInterface {
   async componentWillLoad(): Promise<void> {
     this.isFullscreen = await appWindow.isFullscreen();
 
-    this.$logs = await listen<string>('logs', event => {
+    this.$logs = await listen<LogPayload>('logs', event => {
       this.logs = [event.payload, ...this.logs];
     });
     this.$logsEnd = await listen<FFmpegPayload>('logs:end', async event => {
@@ -39,6 +39,7 @@ export class BlobApp implements ComponentInterface {
           duration: 5000
         });
         await toast.present();
+        this.logs = [{ level: 'INFO', message: 'Téléchargement terminé' }];
       } else {
         const toast = await toastController.create({
           message: 'Erreur lors du téléchargement',
@@ -47,6 +48,7 @@ export class BlobApp implements ComponentInterface {
           duration: 5000
         });
         await toast.present();
+        this.logs = [{ level: 'ERROR', message: 'Erreur lors du téléchargement' }];
       }
     });
   }
@@ -83,18 +85,6 @@ export class BlobApp implements ComponentInterface {
 
   private async download(): Promise<void> {
     const data = new FormData(this.form);
-    console.log(
-      BlobArgs.builder()
-        .setDownloadUrl(data.get('url') as string)
-        .setOutputPath(data.get('path') as string)
-        .setOutputName(data.get('name') as string)
-        .setExtension(data.get('ext') as string)
-        .setFps(parseInt(data.get('fps').toString()))
-        .setBitRate(data.get('bitrate') as string)
-        .setCodec(data.get('codec') as string)
-        .toJson()
-    );
-
     const args = await BlobArgs.builder()
       .setDownloadUrl(data.get('url') as string)
       .setOutputPath(data.get('path') as string)
@@ -194,7 +184,7 @@ export class BlobApp implements ComponentInterface {
                 <div>
                   {this.logs.map(log => (
                     <ion-text>
-                      <p>{log}</p>
+                      <p class='ion-no-margin'>[{log.level}] : {log.message}</p>
                     </ion-text>
                   ))}
                 </div>
