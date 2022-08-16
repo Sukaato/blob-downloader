@@ -3,8 +3,8 @@
   windows_subsystem = "windows"
 )]
 
-mod cmd;
 mod app_logs;
+mod cmd;
 
 fn main() {
   app_logs::setup();

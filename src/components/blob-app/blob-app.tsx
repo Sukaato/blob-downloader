@@ -184,7 +184,9 @@ export class BlobApp implements ComponentInterface {
                 <div>
                   {this.logs.map(log => (
                     <ion-text>
-                      <p class='ion-no-margin'>[{log.level}] : {log.message}</p>
+                      <p class='ion-no-margin'>
+                        [{log.level}] : {log.message}
+                      </p>
                     </ion-text>
                   ))}
                 </div>
