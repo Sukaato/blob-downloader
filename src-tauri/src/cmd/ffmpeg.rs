@@ -1,13 +1,8 @@
-use serde::Serialize;
 use tauri::api::process::{Command, CommandEvent};
 use tauri::async_runtime;
 use tauri::Runtime;
 
-#[derive(Clone, Serialize)]
-struct LogPayload {
-  message: String,
-  level: log::Level,
-}
+use crate::util::LogPayload;
 
 #[tauri::command]
 pub async fn command_ffmpeg<R: Runtime>(

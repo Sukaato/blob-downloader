@@ -5,8 +5,15 @@
 
 mod app_logs;
 mod cmd;
+mod util;
+
+use std::fs::create_dir_all;
+
+use crate::util::get_logs_dir;
 
 fn main() {
+  create_dir_all(get_logs_dir()).unwrap();
+
   app_logs::setup();
   log::info!("App start");
 
