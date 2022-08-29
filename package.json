@@ -20,6 +20,7 @@
   "dependencies": {
     "@ionic/core": "6.2.1",
     "@tauri-apps/api": "^1.0.2",
+    "execa": "^6.1.0",
     "nexus-http": "~2.4.1",
     "uuid": "^8.3.2"
   },
