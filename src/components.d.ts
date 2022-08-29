@@ -8,16 +8,9 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface BlobApp {
     }
-    interface BlobModeSwitch {
-    }
-    interface BlobModeUrl {
-    }
     interface BlobOptions {
+        "getArgs": () => Promise<string[]>;
     }
-}
-export interface BlobModeSwitchCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLBlobModeSwitchElement;
 }
 declare global {
     interface HTMLBlobAppElement extends Components.BlobApp, HTMLStencilElement {
@@ -25,18 +18,6 @@ declare global {
     var HTMLBlobAppElement: {
         prototype: HTMLBlobAppElement;
         new (): HTMLBlobAppElement;
-    };
-    interface HTMLBlobModeSwitchElement extends Components.BlobModeSwitch, HTMLStencilElement {
-    }
-    var HTMLBlobModeSwitchElement: {
-        prototype: HTMLBlobModeSwitchElement;
-        new (): HTMLBlobModeSwitchElement;
-    };
-    interface HTMLBlobModeUrlElement extends Components.BlobModeUrl, HTMLStencilElement {
-    }
-    var HTMLBlobModeUrlElement: {
-        prototype: HTMLBlobModeUrlElement;
-        new (): HTMLBlobModeUrlElement;
     };
     interface HTMLBlobOptionsElement extends Components.BlobOptions, HTMLStencilElement {
     }
@@ -46,25 +27,16 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "blob-app": HTMLBlobAppElement;
-        "blob-mode-switch": HTMLBlobModeSwitchElement;
-        "blob-mode-url": HTMLBlobModeUrlElement;
         "blob-options": HTMLBlobOptionsElement;
     }
 }
 declare namespace LocalJSX {
     interface BlobApp {
     }
-    interface BlobModeSwitch {
-        "onBlobModeSelect"?: (event: BlobModeSwitchCustomEvent<BlobModeEventDetail>) => void;
-    }
-    interface BlobModeUrl {
-    }
     interface BlobOptions {
     }
     interface IntrinsicElements {
         "blob-app": BlobApp;
-        "blob-mode-switch": BlobModeSwitch;
-        "blob-mode-url": BlobModeUrl;
         "blob-options": BlobOptions;
     }
 }
@@ -73,8 +45,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "blob-app": LocalJSX.BlobApp & JSXBase.HTMLAttributes<HTMLBlobAppElement>;
-            "blob-mode-switch": LocalJSX.BlobModeSwitch & JSXBase.HTMLAttributes<HTMLBlobModeSwitchElement>;
-            "blob-mode-url": LocalJSX.BlobModeUrl & JSXBase.HTMLAttributes<HTMLBlobModeUrlElement>;
             "blob-options": LocalJSX.BlobOptions & JSXBase.HTMLAttributes<HTMLBlobOptionsElement>;
         }
     }

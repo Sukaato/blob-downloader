@@ -1,22 +1,22 @@
 import { modalController, toastController } from '@ionic/core';
 import { Component, ComponentInterface, h, Host, Listen, State, Watch } from '@stencil/core';
-import { invoke } from '@tauri-apps/api';
+import { app, invoke } from '@tauri-apps/api';
 import { listen, UnlistenFn } from '@tauri-apps/api/event';
 import { appWindow } from '@tauri-apps/api/window';
-import { BlobArgs } from 'src/shared';
 
 @Component({
   tag: 'blob-app',
   styleUrl: 'blob-app.scss'
 })
 export class BlobApp implements ComponentInterface {
-  private form!: HTMLFormElement;
+  private options!: HTMLBlobOptionsElement;
+
+  private version: string;
 
   private $logs: UnlistenFn;
   private $logsEnd: UnlistenFn;
 
   @State() isFullscreen: boolean;
-  @State() mode: BlobMode = 'url';
   @State() logs: LogPayload[] = [];
 
   @Watch('isFullscreen')
@@ -26,6 +26,7 @@ export class BlobApp implements ComponentInterface {
 
   async componentWillLoad(): Promise<void> {
     this.isFullscreen = await appWindow.isFullscreen();
+    this.version = await app.getVersion();
 
     this.$logs = await listen<LogPayload>('logs', event => {
       this.logs = [event.payload, ...this.logs];
@@ -58,11 +59,6 @@ export class BlobApp implements ComponentInterface {
     this.$logsEnd();
   }
 
-  @Listen('blobModeSelect')
-  onModeChangge(ev: CustomEvent<BlobModeEventDetail>): void {
-    this.mode = ev.detail.value;
-  }
-
   @Listen('mousedown')
   async onGrab(ev: Event): Promise<void> {
     const target = ev.target as HTMLElement;
@@ -72,7 +68,7 @@ export class BlobApp implements ComponentInterface {
   }
 
   private async onMinimize(): Promise<void> {
-    appWindow.minimize();
+    await appWindow.minimize();
   }
 
   private onToggleFullscreen(): void {
@@ -80,44 +76,42 @@ export class BlobApp implements ComponentInterface {
   }
 
   private async onClose(): Promise<void> {
-    appWindow.close();
+    await appWindow.close();
   }
 
   private async download(): Promise<void> {
-    const data = new FormData(this.form);
-    const args = await BlobArgs.builder()
-      .setDownloadUrl(data.get('url') as string)
-      .setOutputPath(data.get('path') as string)
-      .setOutputName(data.get('name') as string)
-      .setExtension(data.get('ext') as string)
-      .setFps(parseInt(data.get('fps').toString()))
-      .setBitRate(data.get('bitrate') as string)
-      .setCodec(data.get('codec') as string)
-      .build();
-    await invoke('command_ffmpeg', { args }).catch(err => {
-      this.logs = [err, ...this.logs];
+    const args = await this.options.getArgs().catch(async (err: Error) => {
+      const toast = await toastController.create({
+        message: err.message,
+        color: 'danger',
+        position: 'top',
+        duration: 5000
+      });
+      await toast.present();
     });
+    if (!args) return;
 
-    const toast = await toastController.create({
-      message: 'Téléchargement en cours ...',
-      color: 'secondary',
-      position: 'top',
-      duration: 5000
-    });
-    await toast.present();
+    await invoke('command_ffmpeg', { args })
+      .then(() =>
+        toastController.create({
+          message: 'Téléchargement en cours ...',
+          color: 'secondary',
+          position: 'top',
+          duration: 5000
+        })
+      )
+      .then(toast => toast.present())
+      .catch(err => {
+        this.logs = [err, ...this.logs];
+      });
   }
 
-  async clearLogs(): Promise<void> {
+  private clearLogs(): void {
     this.logs = [];
   }
 
   async closeModal(): Promise<void> {
-    const modal = await modalController.getTop();
-    await modal.dismiss();
-  }
-
-  private get isUrlMode(): boolean {
-    return this.mode === 'url';
+    await modalController.getTop().then(modal => modal.dismiss());
   }
 
   render() {
@@ -129,7 +123,7 @@ export class BlobApp implements ComponentInterface {
               <ion-img src='/assets/icon/icon.png' id='app-logo' />
               <ion-text>
                 <h1 id='app-title' class='ion-no-margin'>
-                  Blob downloader
+                  Blob downloader <span>{this.version}</span>
                 </h1>
               </ion-text>
             </div>
@@ -145,28 +139,27 @@ export class BlobApp implements ComponentInterface {
               </ion-button>
             </div>
           </header>
+
           <main>
             <ion-content color='primary' class='ion-padding'>
               <div class='app-content'>
-                <div class='app-content__header ion-justify-content-between ion-align-items-center'>
-                  <blob-mode-switch />
+                <div class='app-content__header ion-justify-content-end ion-align-items-center'>
                   <ion-button fill='clear' color='tertiary' id='logs-button' class='ion-no-margin' title='Logs'>
                     <ion-label>Logs</ion-label>
                     <ion-icon name='reader-outline' slot='end' />
                   </ion-button>
                 </div>
-                <form ref={ref => (this.form = ref)}>
-                  {this.isUrlMode && <blob-mode-url />}
-                  <blob-options />
-                </form>
+                <blob-options ref={ref => (this.options = ref)} />
               </div>
             </ion-content>
           </main>
+
           <footer class='ion-justify-content-center ion-align-items-center'>
             <ion-button type='submit' color='tertiary' onClick={() => this.download()}>
               Télécharger
             </ion-button>
           </footer>
+
           <ion-modal trigger='logs-button'>
             <ion-content>
               <div class='logs-content'>
