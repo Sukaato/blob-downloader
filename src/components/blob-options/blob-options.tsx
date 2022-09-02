@@ -1,6 +1,6 @@
 import { Component, h, Host, Method, State } from '@stencil/core';
 import { dialog } from '@tauri-apps/api';
-import { downloadDir, sep } from '@tauri-apps/api/path';
+import { downloadDir } from '@tauri-apps/api/path';
 import { BlobArgs } from 'src/shared';
 import { v4 as uuid } from 'uuid';
 
@@ -13,7 +13,7 @@ export class BlobOptions {
   private path!: HTMLIonInputElement;
 
   private exts = ['mp4', 'avi', 'mkv', 'mov', 'flv'];
-  private codecs = ['h264_nvenc'];
+  private encoders = ['h264_nvenc'];
 
   @State() folderPath: string;
   @State() outputName: string = uuid();
@@ -38,7 +38,7 @@ export class BlobOptions {
       .setExtension(data.get('ext') as string)
       .setFps(parseInt(data.get('fps').toString()))
       .setBitRate(data.get('bitrate') as string)
-      .setCodec(data.get('codec') as string)
+      .setEncoder(data.get('encoder') as string)
       .build();
   }
 
@@ -52,13 +52,12 @@ export class BlobOptions {
   }
 
   private async getFolderPath() {
-    const folderPath = (await dialog.open({
+    const folderPath = await dialog.open({
       directory: true,
       defaultPath: await downloadDir(),
       multiple: false
-    })) as string;
-
-    this.folderPath = folderPath.endsWith(sep) ? folderPath : folderPath + sep;
+    });
+    this.folderPath = folderPath as string;
   }
 
   private setOutputName(name: string): void {
@@ -115,29 +114,27 @@ export class BlobOptions {
                 <ion-label>Paramètres avancés</ion-label>
               </ion-item>
 
-              <ion-list slot='content'>
-                <div class='blob-options-content ion-padding'>
-                  <ion-item fill='outline' lines='full' color='tertiary'>
-                    <ion-label position='stacked'>FPS</ion-label>
-                    <ion-input name='fps' type='number' value={25} min={25} />
-                  </ion-item>
+              <ion-list class='blob-options-content ion-padding' slot='content'>
+                <ion-item fill='outline' color='tertiary'>
+                  <ion-label position='stacked'>FPS</ion-label>
+                  <ion-input name='fps' type='number' value={25} min={25} />
+                </ion-item>
 
-                  <ion-item fill='outline' lines='full' color='tertiary'>
-                    <ion-label position='stacked'>Bitrate</ion-label>
-                    <ion-input name='bitrate' type='text' value='2.6M' readonly />
-                  </ion-item>
+                <ion-item fill='outline' color='tertiary'>
+                  <ion-label position='stacked'>Bitrate</ion-label>
+                  <ion-input name='bitrate' type='text' value='2.6M' readonly />
+                </ion-item>
 
-                  <ion-item fill='outline' lines='full' color='tertiary'>
-                    <ion-label position='stacked'>Codec</ion-label>
-                    <ion-select name='codec' interface='popover' placeholder='Codec' value={this.codecs[0]}>
-                      {this.codecs.map(codec => (
-                        <ion-select-option key={codec} value={codec}>
-                          {codec}
-                        </ion-select-option>
-                      ))}
-                    </ion-select>
-                  </ion-item>
-                </div>
+                <ion-item fill='outline' color='tertiary'>
+                  <ion-label position='stacked'>Codec</ion-label>
+                  <ion-select name='encoder' interface='popover' placeholder='Encoder' value={this.encoders[0]}>
+                    {this.encoders.map(codec => (
+                      <ion-select-option key={codec} value={codec}>
+                        {codec}
+                      </ion-select-option>
+                    ))}
+                  </ion-select>
+                </ion-item>
               </ion-list>
             </ion-accordion>
           </ion-accordion-group>

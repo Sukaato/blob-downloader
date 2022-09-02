@@ -1,4 +1,4 @@
-import { downloadDir } from '@tauri-apps/api/path';
+import { downloadDir, join } from '@tauri-apps/api/path';
 import { v4 as uuid } from 'uuid';
 
 export class BlobArgs {
@@ -19,7 +19,7 @@ export class BlobArgs {
     return this;
   }
 
-  setCodec(codec: string): BlobArgs {
+  setEncoder(codec: string): BlobArgs {
     this.codec = codec;
     return this;
   }
@@ -60,7 +60,7 @@ export class BlobArgs {
 
   async build(): Promise<string[]> {
     await this.prebuild();
-    const output = `${this.path}${this.outputName}.${this.ext}`;
+    const output = await join(this.path, `${this.outputName}.${this.ext}`);
     const args = ['-y', '-i', this.downloadUrl, '-c:v', this.codec, '-b:v', this.bitrate, '-filter:v', `fps=${this.fps}`, output];
 
     console.log(this.toJson());

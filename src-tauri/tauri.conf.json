@@ -1,12 +1,12 @@
 {
   "package": {
-    "productName": "blob-downloader",
+    "productName": "Blob downloader",
     "version": "0.4.0"
   },
   "build": {
     "distDir": "../www",
     "devPath": "http://localhost:3333/",
-    "beforeDevCommand": "npm start",
+    "beforeDevCommand": "npm run serve",
     "beforeBuildCommand": "npm run build",
     "withGlobalTauri": true
   },

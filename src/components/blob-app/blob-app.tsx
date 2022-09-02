@@ -29,7 +29,7 @@ export class BlobApp implements ComponentInterface {
     this.version = await app.getVersion();
 
     this.$logs = await listen<LogPayload>('logs', event => {
-      this.logs = [event.payload, ...this.logs];
+      if (event.payload.message.includes('@')) this.logs = [event.payload, ...this.logs];
     });
     this.$logsEnd = await listen<FFmpegPayload>('logs:end', async event => {
       if (event.payload.code === 0) {
@@ -40,7 +40,7 @@ export class BlobApp implements ComponentInterface {
           duration: 5000
         });
         await toast.present();
-        this.logs = [{ level: 'INFO', message: 'Téléchargement terminé' }];
+        this.logs = [{ level: 'INFO', message: 'Téléchargement terminé' }, ...this.logs];
       } else {
         const toast = await toastController.create({
           message: 'Erreur lors du téléchargement',

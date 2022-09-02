@@ -21,6 +21,7 @@ fn main() {
     .invoke_handler(tauri::generate_handler![
       cmd::check_internet::command_check_internet,
       cmd::ffmpeg::command_ffmpeg,
+      cmd::app::command_versions,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
